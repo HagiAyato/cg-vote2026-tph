@@ -1,0 +1,1 @@
+https://search.yahoo.co.jp/realtime/api/v1/pagination?p=キーワード&results=40
