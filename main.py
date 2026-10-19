@@ -14,7 +14,7 @@ import requests
 INPUT_CSV = Path("idioms.csv")
 
 # 出力先
-OUTPUT_DIR = Path("pph")
+OUTPUT_DIR = Path("data/pph")
 
 # Yahoo!リアルタイム検索 API
 API_URL = "https://search.yahoo.co.jp/realtime/api/v1/pagination"

@@ -19,6 +19,9 @@ WAIT_SECONDS = 30
 COUNT_SELECTOR = (
     "#graph div[class*='Chart_totalCount'] > p > span"
 )
+NO_RESULTS_XPATH = (
+    "//h1[contains(., 'に一致する情報は見つかりませんでした')]"
+)
 
 
 def get_post_count(query: str) -> int:
@@ -50,7 +53,34 @@ def get_post_count(query: str) -> int:
         driver.get(url)
         wait = WebDriverWait(driver, WAIT_SECONDS)
 
-        # グラフ上部の数値が描画されるまで待つ
+        def results_ready(current_driver):
+            no_results = current_driver.find_elements(
+                By.XPATH,
+                NO_RESULTS_XPATH,
+            )
+            if any(element.is_displayed() for element in no_results):
+                return True
+
+            return any(
+                element.is_displayed()
+                for element in current_driver.find_elements(
+                    By.CSS_SELECTOR,
+                    COUNT_SELECTOR,
+                )
+            )
+
+        # グラフまたは検索結果なしの表示が出るまで待つ
+        wait.until(results_ready)
+
+        if any(
+            element.is_displayed()
+            for element in driver.find_elements(
+                By.XPATH,
+                NO_RESULTS_XPATH,
+            )
+        ):
+            return 0
+
         element = wait.until(
             EC.visibility_of_element_located(
                 (By.CSS_SELECTOR, COUNT_SELECTOR)
@@ -72,7 +102,7 @@ def get_post_count(query: str) -> int:
 
 
 if __name__ == "__main__":
-    keyword = "ライブ音源"
+    keyword = "#シンデレラガール総選挙2026 喜多日菜子 に投票しました！"
 
     try:
         count = get_post_count(keyword)
